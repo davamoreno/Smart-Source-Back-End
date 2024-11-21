@@ -13,13 +13,24 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('super_admin_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('admin_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('member_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('paper_type_id')->constrained('post_paper_types')->cascadeOnDelete();
+            $table->foreignId('category_id')->constrained('post_categories')->cascadeOnDelete();
+
+
             $table->string('title', 255);
             $table->string('description', 255);
             $table->string('slug')->unique();
-            $table->enum('status', ['pending', 'published', 'denied']);
-            $table->bigInteger('user_id');
-            $table->bigInteger('category_id');
-            $table->bigInteger('paper_type_id');
+            $table->string('file_path');
+            $table->string('file_name');
+            $table->integer('file_size');
+
+            $table->enum('file_type', ['word', 'pdf', 'excel']);
+            $table->enum('status', ['pending', 'published', 'denied'])->default('pending');
+
+            $table->timestamp('approve_at');
             $table->timestamps();
         });
     }

@@ -12,7 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -33,7 +33,6 @@ class AuthController extends Controller{
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
 
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-
         ]);
 
         $user = User::create([
@@ -44,10 +43,10 @@ class AuthController extends Controller{
 
         $user->save();
         
-        if (Auth::check() && Auth::user()->hasRole(UserRole::SUPER_ADMIN->value)) {
-            $user->assignRole(UserRole::ADMIN->value);  
+        if (Auth::user()->hasRole(UserRole::ADMIN->value)) {
+            $user->assignRole(UserRole::ADMIN->value); 
         } else {
-            $user->assignRole(UserRole::MEMBER->value);
+            $user->assignRole(UserRole::MEMBER->value); 
         }
 
         event(new Registered($user));

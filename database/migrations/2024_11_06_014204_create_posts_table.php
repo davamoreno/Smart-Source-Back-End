@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignId('paper_type_id')->constrained('post_paper_types')->cascadeOnDelete();
             $table->foreignId('category_id')->constrained('post_categories')->cascadeOnDelete();
 
-
             $table->string('title', 255);
             $table->string('description', 255);
             $table->string('slug')->unique();

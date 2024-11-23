@@ -44,7 +44,7 @@ class AuthController extends Controller{
 
         $user->save();
         
-        if (Auth::check() && Auth::user()->hasRole(UserRole::SUPER_ADMIN->value)) {
+        if (Auth::user()->hasRole(UserRole::SUPER_ADMIN->value)) {
             $user->assignRole(UserRole::ADMIN->value);  
         } else {
             $user->assignRole(UserRole::MEMBER->value);

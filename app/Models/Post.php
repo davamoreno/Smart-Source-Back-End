@@ -43,10 +43,14 @@ class Post extends Model
         return $this->belongsTo(PostPaperType::class, 'paper_type_id');
     }
 
+    public function comment(){
+        return $this->hasMany(UserComment::class);
+    }
+
     public function generateSlug(){
         $slug = Str::slug($this->title);
 
-        $count = Post::where('slug', $slug)->count;
+        $count = Post::where('slug', $slug)->count();
 
         if($count > 0){
             $slug .= '.' . ($count + 1);

@@ -13,8 +13,6 @@
     <form method="POST" action="{{ route('admin.store') }}">
         @csrf
 
-        <input type="hidden" name="role" value="{{ App\Enums\UserRole::ADMIN->value }}">
-
         <div>
             <label for="username">Username:</label>
             <input type="text" name="username" id="username"

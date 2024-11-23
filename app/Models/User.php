@@ -7,6 +7,7 @@ use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -25,6 +26,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'role'
     ];
     
     /**
@@ -47,6 +49,14 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    public function posts(){
+        return $this->hasMany(Post::class);
+    }
+
+    public function comments(){
+        return $this->hasMany(UserComment::class);
     }
 
 }

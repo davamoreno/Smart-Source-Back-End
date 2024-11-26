@@ -9,7 +9,7 @@
         <form method="GET" action="{{ route('logout.store') }}" >
             <li>
                 <a href="/logout">
-                    Logout
+                    Logouoooot
                 </a>
             </li>
         </form>

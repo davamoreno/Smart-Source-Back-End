@@ -9,6 +9,13 @@
     "build": {
       "env": {
         "NODE_ENV": "production"
+      },
+      "command": "npm run build && php artisan optimize:clear" 
+    },
+      "rewrites": [
+      {
+        "source": "/(.*)",
+        "destination": "/index.php"
       }
-    }
- }
+    ]
+}

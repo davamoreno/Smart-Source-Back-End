@@ -4,7 +4,7 @@
     use App\Http\Controllers\Auth;
 
     Route::get('/', function () {
-        return view('welcome');
+        return view('landing');
     });
 
     

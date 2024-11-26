@@ -7,8 +7,8 @@
     <title>Document</title>
 </head>
 <body>
-    @csrf
-    
+    @extends('layouts.layout')
+    @section('content')
     @guest
         <p>Hello Guest</p>    
     @endguest
@@ -45,5 +45,6 @@
             </li>
         </form>
     @endrole
+    @endsection
 </body>
 </html>

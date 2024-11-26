@@ -7,13 +7,17 @@
         return view('welcome');
     });
 
-    Route::get('/register/admin', [Auth\Admin\AuthController::class, 'index'])
+    
+
+    Route::controller(Auth\Admin\AuthController::class)->group( function () {
+                Route::get('/register/admin', 'index')
                     ->middleware('auth', 'role:super_admin')
                     ->name('admin.register');
 
-    Route::post('/register/admin', [Auth\Admin\AuthController::class, 'store'])
+                Route::post('/register/admin', 'store')
                     ->middleware('auth', 'role:super_admin')
                     ->name('admin.store');
+    });
 
     Route::get('/register', [Auth\Member\AuthController::class, 'index'])
                     ->middleware('guest')

@@ -7,12 +7,15 @@
       }
     ],
     "build": {
-      "command": "npm run build && php artisan optimize:clear"
+      "command": "npm run build && php artisan optimize:clear",
+      "env": {
+        "NODE_ENV": "production"
+      } 
     },
-    "rewrites": [
+      "rewrites": [
       {
         "source": "/(.*)",
         "destination": "/index.php"
       }
     ]
- }
+}

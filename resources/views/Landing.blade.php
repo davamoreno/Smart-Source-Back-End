@@ -2,4 +2,5 @@
     @section('title', 'Landing Page - Smart Source')
     @section('content')
         <x-landing.hero/>
+        <x-landing.whyus/>
     @endsection

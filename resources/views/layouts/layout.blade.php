@@ -13,7 +13,7 @@
 </head>
 <body>
     @include("partials.navbar")
-        <main class="container">
+        <main>
             @yield('content')
         </main>
     @include("partials.footer")

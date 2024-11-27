@@ -22,6 +22,7 @@
       "APP_ENV": "production",
       "APP_DEBUG": "true",
       "APP_URL": "https://smart-source-project.vercel.app",
+      "APP_KEY": "base64:WdZ2nSfdT2UrWXwo9PbFPSYgCcFcjH7g4lj+WEk4mnQ=",
 
       "APP_CONFIG_CACHE": "/tmp/config.php",
       "APP_EVENTS_CACHE": "/tmp/events.php",

@@ -1,9 +1,12 @@
     <?php
 
-    use Illuminate\Support\Facades\Route;
+use App\Events\ConfigEvent;
+use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\Auth;
 
     Route::get('/', function () {
+        ConfigEvent::dispatch('lorem ipsum');
+
         return view('landing');
     });
 

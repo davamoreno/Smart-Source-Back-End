@@ -12,10 +12,10 @@
                 <a class="nav-link active" aria-current="page" href="#">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="#">Category</a>
+                <a class="nav-link active" href="#">Categories</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="#">Repository</a>
+                <a class="nav-link active" href="#">Papers</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link active" href="#">About Us</a>

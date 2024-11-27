@@ -21,6 +21,6 @@
         </div>
     </div>
     <div class="ms-auto">
-        <img src="/image/hero.png" alt="">
+        <img src="{{ asset('images/hero.png') }}" alt="">
     </div>
 </div>

@@ -1,17 +1,27 @@
 {
   "version": 2,
-    "framework": null,
   "functions": {
-      "api/index.php": { "runtime": "vercel-php@0.6.0" }
+    "api/index.php": {
+      "runtime": "vercel-php@0.7.3"
+    }
   },
-  "routes": [{
+  "routes": [
+    {
       "src": "/(.*)",
       "dest": "/api/index.php"
-  }],
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/public/images/$1"
+    },
+    {
+      "src": "/svg/(.*)",
+      "dest": "/public/svg/$1"
+    }],
   "env": {
       "APP_ENV": "production",
-      "APP_DEBUG": "false",
-      "APP_URL": "http://localhost",
+      "APP_DEBUG": "true",
+      "APP_URL": "https://smart-source-project.vercel.app",
 
       "APP_CONFIG_CACHE": "/tmp/config.php",
       "APP_EVENTS_CACHE": "/tmp/events.php",

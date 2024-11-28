@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"> 
     <title>@yield('title', 'Default Title')</title>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <script src="/public/node_modules/animejs/lib/anime.min.js"></script>
 </head>
 <body>
     @include("partials.navbar")

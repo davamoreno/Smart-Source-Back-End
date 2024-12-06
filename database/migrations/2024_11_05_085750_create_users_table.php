@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email', 255)->unique();
             $table->string('role')->default('user');
             $table->string('password');
-
+            $table->foreignId('faculty_id')->nullable()->constrained('faculties')->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();
         });

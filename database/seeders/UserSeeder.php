@@ -20,9 +20,9 @@ class UserSeeder extends Seeder
         $role = Role::create(['name' => 'member', 'guard_name' => 'web']);
 
         $super_admin = User::create([
-            'username' => 'Dava27',
+            'username' => 'dava27',
             'email' => 'davamoreno28@gmail.com',
-            'password' => bcrypt('22446688')
+            'password' => bcrypt('22446688'),
         ]);
 
         $super_admin->assignRole(UserRole::SUPER_ADMIN->value);

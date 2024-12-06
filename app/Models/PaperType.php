@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PostPaperType extends Model
+class PaperType extends Model
 {
     protected $fillable = [
         'name'

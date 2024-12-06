@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Validation\Rule;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, HasApiTokens;
     
     /** @use HasFactory<\Database\Factories\UserFactory> */
 
@@ -26,7 +27,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'role'
+        'faculty_id'
     ];
     
     /**
@@ -51,12 +52,32 @@ class User extends Authenticatable
         ];
     }
 
-    public function posts(){
+    public function faculty()
+    {
+        return $this->belongsTo(Faculty::class);
+    }
+
+    public function posts()
+    {
         return $this->hasMany(Post::class);
     }
 
-    public function comments(){
-        return $this->hasMany(UserComment::class);
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
+
+    public function histories()
+    {
+        return $this->hasMany(History::class);
+    }
+
+    public function bookmarks(){
+        return $this->hasMany(Bookmark::class);
+    } 
+
+    public function reports(){
+        return $this->hasMany(Report::class);
+    } 
 
 }

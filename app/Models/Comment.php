@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserComment extends Model
+class Comment extends Model
 {
     use HasFactory;
 
@@ -16,12 +16,12 @@ class UserComment extends Model
         'content',
     ];
 
-    public function member(){
-        return $this->belongsTo(User::class, 'member_id');
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function parent(){
-        return $this->belongsTo(UserComment::class, 'parent_id');
+        return $this->belongsTo(Comment::class, 'parent_id');
     }
 
     public function post(){
@@ -29,6 +29,6 @@ class UserComment extends Model
     }
 
     public function replies(){
-        return $this->hasMany(UserComment::class, 'parent_id');
+        return $this->hasMany(Comment::class, 'parent_id');
     }
 }

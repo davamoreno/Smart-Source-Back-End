@@ -4,54 +4,66 @@ namespace App\Http\Controllers\Auth\Member;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Auth\Events\Registered;
-
-use Illuminate\Http\RedirectResponse;
+use App\Models\User;    
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules;
-use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller{
+    public function register(Request $request){
+        try{
+            $request->validate([
+                'username' => 'required|string|max:255|unique:users',
+                'email' => 'required|string|max:255|unique:users',
+                'password' => 'required|string|min:8',
+                'faculty_id' => 'nullable|exists:faculties,id',
+            ]);
 
-    public function index(): View
-    {
-        return view('auth.member.index');
+            $user = User::create([
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'faculty_id' => $request->faculty_id,
+            ]);
+            
+            $user->save();
+            $user->assignRole(UserRole::MEMBER->value);
+
+            return response()->json(['message' => 'Register Successfully', 'user' => $user], 201);
+        }
+        catch(\Exception $e){
+            return response()->json(['message' =>  $e->getMessage()], 500);
+        }
     }
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function store(Request $request): RedirectResponse {
+
+    public function login(Request $request){
         $request->validate([
-            'username' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'identifier' => 'required|string',
+            'password' => 'required',
         ]);
-
-        $user = User::create([
-            'username' => strtolower($request->username),
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        $user->save();
         
-        if (Auth::user()->hasRole(UserRole::ADMIN->value)) {
-            $user->assignRole(UserRole::ADMIN->value); 
-        } else {
-            $user->assignRole(UserRole::MEMBER->value); 
+        $identifierField = filter_var($request->input('identifier'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $request->merge([$identifierField, $request->input('identifier')]);
+
+        if(!Auth::attemptWhen([$identifierField => $request->identifier, 'password' => $request->password], function($user){
+            return true;
+        })) {
+            throw ValidationException::withMessages([
+                'identifier' => ['Wrong Email or Username/Password'],
+            ]);
         }
 
-        event(new Registered($user));
+        $user = $request->user();
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-        return redirect()->back()->with('Berhasil', 'Success');
+        return response()->json(['message' => 'identifier Successfully', 'access_token' => $token, 'token_type' => 'Bearer'], 200);
+    }
+
+    public function logout(Request $request){
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Logout Successfully'], 200);
     }
 
 }

@@ -11,11 +11,12 @@ class Post extends Model
     [
         'title',
         'description',
-        'file_path',
-        'file_name',
-        'file_size',
         'category_id',
-        'paper_type_id'
+        'paper_type_id',
+        'user_id',         
+        'slug',           
+        'status',  
+        'approved_at',
     ];
 
     protected $casts = [
@@ -23,31 +24,45 @@ class Post extends Model
     ];
 
 
-    public function superAdmin(){
-        return $this->belongsTo(User::class, 'super_admin_id');
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function admin(){
-        return $this->belongsTo(User::class, 'admin_id');
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function member(){
-        return $this->belongsTo(User::class, 'member_id');
+    public function paperType()
+    {
+        return $this->belongsTo(PaperType::class, 'paper_type_id');
     }
 
-    public function category(){
-        return $this->belongsTo(PostCategory::class, 'category_id');
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 
-    public function paperType(){
-        return $this->belongsTo(PostPaperType::class, 'paper_type_id');
+    public function histories()
+    {
+        return $this->hasMany(History::class);
     }
 
-    public function comment(){
-        return $this->hasMany(UserComment::class);
+    public function bookmarks(){
+        return $this->hasMany(Bookmark::class);
     }
 
-    public function generateSlug(){
+    public function reports(){
+        return $this->hasMany(Report::class);
+    } 
+
+    public function file(){
+        return $this->hasOne(File::class);
+    }
+
+    public function generateSlug()
+    {
         $slug = Str::slug($this->title);
 
         $count = Post::where('slug', $slug)->count();

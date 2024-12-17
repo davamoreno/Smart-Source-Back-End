@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Spatie\Permission\Models\Role;
+use App\Enums\UserRole;
+use App\Models\User;
 
 return new class extends Migration
 {
@@ -113,6 +116,18 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             $table->primary([$pivotPermission, $pivotRole], 'role_has_permissions_permission_id_role_id_primary');
+
+            Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
+            Role::create(['name' => 'admin', 'guard_name' => 'web']);
+            Role::create(['name' => 'member', 'guard_name' => 'web']);
+
+            $super_admin = User::create([
+                'username' => 'dava27',
+                'email' => 'davamoreno28@gmail.com',
+                'password' => bcrypt('22446688'),
+            ]);
+    
+            $super_admin->assignRole(UserRole::SUPER_ADMIN->value);
         });
 
         app('cache')

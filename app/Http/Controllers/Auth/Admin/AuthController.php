@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Admin;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Models\User;    
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,24 +13,19 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller{
 
-    public function register(Request $request){
+    public function register(UserRequest $request){
         try{
             if (!Auth::user()->hasRole('super_admin')) {
                 return response()->json(['message' => 'Unauthorized. Only SUPER_ADMIN can create ADMIN users.'], 403);
             }
-
-            $request->validate([
-                'username' => 'required|string|max:255|unique:users',
-                'email' => 'required|string|max:255|unique:users',
-                'password' => 'required|string|min:8'
-            ]);
         
-            $user = User::create([
+            $user = new User([
                 'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => UserRole::ADMIN
             ]);
+
             $user->save();
             $user->assignRole(UserRole::ADMIN);
             return response()->json(['message' => 'Admin Created Successfully', 'user' => $user ], 201);
@@ -55,11 +51,17 @@ class AuthController extends Controller{
             ]);
         }
 
-        if (Auth::user()->hasRole('admin') || Auth::user()->hasRole('super_admin')) { 
+        if (Auth::user()->hasRole('admin')) { 
             $user = $request->user();
             $token = $user->createToken('auth_token')->plainTextToken;
     
             return response()->json(['message' => 'Welcome Admin !', 'access_token' => $token, 'token_type' => 'Bearer'], 200);
+        }
+        else if (Auth::user()->hasRole('super_admin')){
+            $user = $request->user();
+            $token = $user->createToken('auth_token')->plainTextToken;
+    
+            return response()->json(['message' => 'Welcome Super Admin !', 'access_token' => $token, 'token_type' => 'Bearer'], 200);
         }
         else{
             return response()->json(['message' => 'You\'re not a admin'], 500);

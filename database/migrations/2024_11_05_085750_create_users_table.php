@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use function Laravel\Prompts\table;
+
 return new class extends Migration
 {
     /**
@@ -17,6 +19,7 @@ return new class extends Migration
             $table->string('email', 255)->unique();
             $table->string('role')->default('user');
             $table->string('password');
+            $table->text('profile', 255)->nullable();
             $table->foreignId('faculty_id')->nullable()->constrained('faculties')->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();

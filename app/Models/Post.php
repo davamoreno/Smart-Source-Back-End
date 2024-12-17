@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -65,12 +66,18 @@ class Post extends Model
     {
         $slug = Str::slug($this->title);
 
-        $count = Post::where('slug', $slug)->count();
+        $count = Post::where('slug', 'like', $slug.'%')->count();
 
         if($count > 0){
-            $slug .= '.' . ($count + 1);
+            $slug .= '-' . ($count + 1);
         }
 
         return $slug;
+    }
+
+    protected function setTitleAttribute($value)
+    {
+        $this->attributes['title'] = $value;
+        $this->slug = $this->generateSlug($value);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Member;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
 use App\Models\User;    
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,26 +12,31 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller{
-    public function register(Request $request){
-        try{
-            $request->validate([
-                'username' => 'required|string|max:255|unique:users',
-                'email' => 'required|string|max:255|unique:users',
-                'password' => 'required|string|min:8',
-                'faculty_id' => 'nullable|exists:faculties,id',
-            ]);
+    
+    public function getUserProfile(Request $request){
+        $user = $request->user();
+        return response()->json($user);
+    }
 
-            $user = User::create([
+    public function register(UserRequest $request){
+        try{
+            $user = new User([
                 'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'profile' => $request->profile, 
                 'faculty_id' => $request->faculty_id,
             ]);
             
+            if ($request->hasFile('profile')) {
+                $validated['profile'] = $request->file('profile')->store('profiles', 'public');
+            }
+
             $user->save();
             $user->assignRole(UserRole::MEMBER->value);
 
             return response()->json(['message' => 'Register Successfully', 'user' => $user], 201);
+
         }
         catch(\Exception $e){
             return response()->json(['message' =>  $e->getMessage()], 500);

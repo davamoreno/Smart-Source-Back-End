@@ -27,7 +27,6 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'profile',
         'faculty_id'
     ];
     
@@ -80,5 +79,9 @@ class User extends Authenticatable
     public function reports(){
         return $this->hasMany(Report::class);
     } 
+
+    public function userProfile(){
+        return $this->hasOne(UserProfile::class);
+    }
 
 }

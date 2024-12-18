@@ -21,12 +21,18 @@ class PostController extends Controller{
     }
 
     public function getAllUserPost(){
-        $posts = Post::with(['user', 'category', 'paperType', 'file'])->latest()->get();
+        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])
+                            ->where('status', 'allow')
+                            ->latest()
+                            ->get();
         return response()->json($posts);
     }
 
     public function getUserPost($id){
-        $posts = Post::with(['user', 'category', 'paperType', 'file'])->find($id);
+        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])
+                            ->where('status', 'allow')
+                            ->find($id);
+
         if (!$posts) {
             return response()->json(['message' => 'Post Not Found'], 404);
         }
@@ -46,6 +52,24 @@ class PostController extends Controller{
                 'file_size' => $request->file('file')->getSize()
             ]);
         }
-        return response()->json(['message' => 'Post Has Been Created', 'post' => $post], 201);
+        return response()->json(['message' => 'Post Success Created, Please Wait For Admin Approvement', 'post' => $post], 201);
+    }
+
+    public function validatePost(Request $request, $id){
+        $post = Post::find($id);
+
+        if(!$post){
+            return response()->json(['message' => 'Post Not Found'], 404);
+        }
+
+        $request->validate([
+            'status' => 'required|in:allow,deny'
+        ]);
+
+        $post->status = $request->input('status');
+        $post->approve_at = $request->input('status') === 'allow' ? now() : null;
+        $post->save();
+
+        return response()->json(['message' => 'Post status updated successfully', 'Post' => $post], 201);
     }
 }

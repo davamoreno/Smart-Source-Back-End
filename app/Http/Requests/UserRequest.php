@@ -25,7 +25,7 @@ class UserRequest extends FormRequest
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'profile' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+            'userProfile' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
             'faculty_id' => 'nullable|exists:faculties,id',
         ];
     }

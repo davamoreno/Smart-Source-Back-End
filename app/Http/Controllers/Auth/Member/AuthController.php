@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Auth\Member;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
-use App\Models\User;    
+use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -24,18 +25,24 @@ class AuthController extends Controller{
                 'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'profile' => $request->profile, 
                 'faculty_id' => $request->faculty_id,
             ]);
-            
-            if ($request->hasFile('profile')) {
-                $validated['profile'] = $request->file('profile')->store('profiles', 'public');
-            }
 
             $user->save();
+           
+            if($request->hasFile('user_profile')){
+                $filePath = $request->file('user_profile')->store('profiles', 'public');
+                $userProfile = new UserProfile([
+                    'file_name' => $request->file('user_profile')->getClientOriginalName(),
+                    'file_path' => $filePath,
+                    'file_size' => $request->file('user_profile')->getSize()
+                ]);
+                $user->userProfile()->save($userProfile);
+            }
+
             $user->assignRole(UserRole::MEMBER->value);
 
-            return response()->json(['message' => 'Register Successfully', 'user' => $user], 201);
+            return response()->json(['message' => 'Register Successfully', 'user' => $user->load('userProfile')], 201);
 
         }
         catch(\Exception $e){

@@ -16,13 +16,12 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('paper_type_id')->nullable()->constrained('paper_types')->cascadeOnDelete();
             $table->foreignId('category_id')->nullable()->constrained('categories')->cascadeOnDelete();
+            $table->foreignId('approve_by')->nullable()->constrained('users')->nullOnDelete();
 
             $table->string('title', 255);
             $table->string('description', 255);
             $table->string('slug')->unique();
-
-            $table->enum('file_type', ['word', 'pdf', 'excel']);
-            $table->enum('status', ['pending', 'published', 'denied'])->default('pending');
+            $table->enum('status', ['pending', 'allow', 'deny'])->default('pending');
 
             $table->timestamp('approve_at');
             $table->timestamps();

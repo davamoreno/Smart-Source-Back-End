@@ -16,8 +16,9 @@ class Post extends Model
         'paper_type_id',
         'user_id',         
         'slug',           
-        'status',  
-        'approved_at',
+        'status',
+        'approve_by',
+        'approve_at',
     ];
 
     protected $casts = [
@@ -28,6 +29,10 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function approvedBy() {
+        return $this->belongsTo(User::class, 'approve_by');
     }
 
     public function category()

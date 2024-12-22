@@ -11,18 +11,24 @@ use Illuminate\Support\Facades\Storage;
 //Member Auth
 Route::post('/member/register', [Member\AuthController::class, 'register']);
 Route::post('/member/login',    [Member\AuthController::class, 'login']);
-Route::middleware(['auth:sanctum'])->post('/member/logout', [Member\AuthController::class, 'logout']);
+Route::middleware(['auth:sanctum', 'role:member'])->post('/member/logout', [Member\AuthController::class, 'logout']);
 
-//Admin Auth
+//Super Admin Create Admin
 Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
     Route::post('/admin/register', [Admin\AuthController::class, 'register']);
 });
 
-//Create Category
+// Super Admin and Admin Login
+Route::post('/admin/login', [Admin\AuthController::class, 'login']);
+
+//Admin and Super Admin Management
 Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->group(function () {
+    Route::get('/admin/profile', [Admin\AuthController::class, 'getAdminProfile']);
+    Route::post('/admin/logout', [Admin\AuthController::class, 'logout']);
     Route::post('/category', [Post\CategoryController::class, 'create']);
     Route::post('/papertype', [Post\PaperTypeController::class, 'create']);
-    Route::post('/admin/login',    [Admin\AuthController::class, 'login']);
+    Route::post('/university', [Post\Admin\UniversityController::class, 'store']);
+    Route::post('/faculty', [Post\Admin\FacultyController::class, 'store']);
 });
 
 

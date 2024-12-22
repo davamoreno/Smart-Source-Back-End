@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('username', 255)->unique();
             $table->string('email', 255)->unique();
-            $table->string('role')->default('user');
+            $table->enum('role', ['super_admin', 'admin', 'member']);
             $table->string('password');
             $table->foreignId('faculty_id')->nullable()->constrained('faculties')->onDelete('cascade');
             $table->rememberToken();
@@ -37,6 +37,12 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->longText('payload');
             $table->integer('last_activity')->index();
+        });
+        Schema::table('faculties', function (Blueprint $table) {
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+        });
+        Schema::table('universities', function (Blueprint $table) {
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
         });
     }
 

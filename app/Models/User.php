@@ -78,7 +78,11 @@ class User extends Authenticatable
 
     public function reports(){
         return $this->hasMany(Report::class);
-    } 
+    }
+    
+    public function likes(){
+        return $this->hasMany(Like::class);
+    }
 
     public function userProfile(){
         return $this->hasOne(UserProfile::class);

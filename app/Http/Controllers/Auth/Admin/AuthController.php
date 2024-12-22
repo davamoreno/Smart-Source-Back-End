@@ -13,6 +13,11 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller{
 
+    public function getAdminProfile(Request $request){
+        $user = $request->user();
+        return response()->json($user);
+    }
+
     public function register(UserRequest $request){
         try{
             if (!Auth::user()->hasRole('super_admin')) {
@@ -23,17 +28,18 @@ class AuthController extends Controller{
                 'username' => $request->username,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => UserRole::ADMIN
             ]);
 
-            $user->save();
+            $user->role = 'admin';
             $user->assignRole(UserRole::ADMIN);
+            $user->save();
             return response()->json(['message' => 'Admin Created Successfully', 'user' => $user ], 201);
             }
         catch(\Exception $e){
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
     public function login(Request $request){
         $user = $request->validate([
             'identifier' => 'required|string',
@@ -51,13 +57,13 @@ class AuthController extends Controller{
             ]);
         }
 
-        if (Auth::user()->hasRole('admin')) { 
+        if (Auth::user()->hasRole(UserRole::ADMIN->value)) { 
             $user = $request->user();
             $token = $user->createToken('auth_token')->plainTextToken;
     
             return response()->json(['message' => 'Welcome Admin !', 'access_token' => $token, 'token_type' => 'Bearer'], 200);
         }
-        else if (Auth::user()->hasRole('super_admin')){
+        else if (Auth::user()->hasRole(UserRole::SUPER_ADMIN->value)){
             $user = $request->user();
             $token = $user->createToken('auth_token')->plainTextToken;
     
@@ -66,6 +72,11 @@ class AuthController extends Controller{
         else{
             return response()->json(['message' => 'You\'re not a admin'], 500);
         }
+    }
+    
+    public function logout(Request $request){
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Logout Successfully'], 200);
     }
 }
 

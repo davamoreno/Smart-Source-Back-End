@@ -7,11 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class University extends Model
 {
     protected $fillable = [
-        'name'
+        'name',
+        'created_by'
     ];
 
     public function faculities()
     {
         return $this->hasMany(Faculty::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

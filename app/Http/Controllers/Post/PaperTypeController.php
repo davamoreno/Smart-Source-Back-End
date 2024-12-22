@@ -5,17 +5,21 @@ namespace App\Http\Controllers\Post;
 use App\Http\Controllers\Controller;
 use App\Models\PaperType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PaperTypeController extends Controller
 {
     public function create(Request $request){
         try {
+            $this->authorizeRole(['super_admin', 'admin']);
+
             $request->validate([
                 'name' => 'required|string|max:255|unique:paper_types',
             ]);
 
             $paperType = PaperType::create([
                 'name' => $request->name,
+                'created_by' => Auth::id(),
             ]);
 
             return response()->json([
@@ -28,6 +32,13 @@ class PaperTypeController extends Controller
                 'message' => 'Failed to create paperType.',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    private function authorizeRole(array $roles)
+    {
+        if (!Auth::user() || !Auth::user()->hasAnyRole($roles)) {
+            abort(403, 'Unauthorized');
         }
     }
 }

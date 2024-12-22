@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class PaperTypeController extends Controller
 {
+    public function getPaperTypes(){
+        $paperTypes = PaperType::paginate(6);
+        return response()->json($paperTypes);
+    }
+
     public function create(Request $request){
         try {
             $this->authorizeRole(['super_admin', 'admin']);

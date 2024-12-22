@@ -65,3 +65,7 @@ Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
 
 
 Route::get('/user/post', [Post\PostController::class, 'getAllUserPost']);
+Route::get('/get/faculties', [Post\Admin\FacultyController::class, 'index']);
+Route::get('/get/universities', [Post\Admin\UniversityController::class, 'index']);
+Route::get('/get/categories', [Post\CategoryController::class, 'index']);
+Route::get('/get/papertypes', [Post\PaperTypeController::class, 'getPaperTypes']);

@@ -13,7 +13,7 @@ class FacultyController extends Controller
 {
     public function index()
     {
-        $faculties = Faculty::with('university')->get();
+        $faculties = Faculty::paginate(9);
         return response()->json($faculties);
     }
 

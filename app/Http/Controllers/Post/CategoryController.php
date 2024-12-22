@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role;
 class CategoryController extends Controller
 {
     public function index(){
-        $categories = Category::paginate(10);
+        $categories = Category::paginate(5);
         return response()->json($categories);
     }
 

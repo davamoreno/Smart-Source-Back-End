@@ -67,6 +67,11 @@ class Post extends Model
         return $this->hasOne(File::class);
     }
 
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
     public function generateSlug()
     {
         $slug = Str::slug($this->title);

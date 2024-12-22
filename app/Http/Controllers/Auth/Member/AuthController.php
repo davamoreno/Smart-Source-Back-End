@@ -28,8 +28,10 @@ class AuthController extends Controller{
                 'faculty_id' => $request->faculty_id,
             ]);
 
+            $user->assignRole(UserRole::MEMBER->value);
+            $user->role = 'member';
             $user->save();
-           
+
             if($request->hasFile('user_profile')){
                 $filePath = $request->file('user_profile')->store('profiles', 'public');
                 $userProfile = new UserProfile([
@@ -39,8 +41,6 @@ class AuthController extends Controller{
                 ]);
                 $user->userProfile()->save($userProfile);
             }
-
-            $user->assignRole(UserRole::MEMBER->value);
 
             return response()->json(['message' => 'Register Successfully', 'user' => $user->load('userProfile')], 201);
 
@@ -75,8 +75,6 @@ class AuthController extends Controller{
 
     public function logout(Request $request){
         $request->user()->currentAccessToken()->delete();
-
         return response()->json(['message' => 'Logout Successfully'], 200);
     }
-
 }

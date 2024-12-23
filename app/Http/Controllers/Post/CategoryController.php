@@ -41,6 +41,16 @@ class CategoryController extends Controller
         }
     }
 
+    public function destroy($id)
+    {
+        $this->authorizeRole(['super_admin', 'admin']);
+
+        $faculty = Category::findOrFail($id);
+        $faculty->delete();
+
+        return response()->json(['message' => 'Category deleted successfully.']);
+    }
+
     private function authorizeRole(array $roles)
     {
         if (!Auth::user() || !Auth::user()->hasAnyRole($roles)) {

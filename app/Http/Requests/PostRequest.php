@@ -27,6 +27,7 @@ class PostRequest extends FormRequest
             'category_id' => 'nullable|exists:categories,id',
             'paper_type_id' => 'nullable|exists:paper_types,id',
             'file' => 'nullable|file|mimes:pdf,docx|max:2048',
+            'status' => 'nullable|string|in:pending'
         ];
     }
 }

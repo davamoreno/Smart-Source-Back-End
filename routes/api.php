@@ -29,6 +29,10 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->group(function ()
     Route::post('/papertype', [Post\PaperTypeController::class, 'create']);
     Route::post('/university', [Post\Admin\UniversityController::class, 'store']);
     Route::post('/faculty', [Post\Admin\FacultyController::class, 'store']);
+    Route::delete('/delete/papertype/{id}', [Post\PaperTypeController::class, 'destroy']);
+    Route::delete('/delete/category/{id}', [Post\CategoryController::class, 'destroy']);
+    Route::delete('/delete/university/{id}', [Post\Admin\UniversityController::class, 'destroy']);
+    Route::put('/post/validation/{id}', [Post\PostController::class, 'validatePost']);
 });
 
 

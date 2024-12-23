@@ -15,9 +15,13 @@ class PostController extends Controller{
     public function search(Request $request){
         $keyword = $request->input('keyword');
 
-        $post = Post::where('title', 'LIKE', '%', $keyword, '%')->paginate(10);
+        $post = Post::where('title', 'LIKE', '%' . $keyword . '%')->paginate(10);
 
-        return response()->json($post);
+        return response()->json([
+            'success' => true,
+            'data' => $post,
+            'message' => 'Search results retrieved successfully',
+        ], 200);
     }
 
     public function getAllUserPost(){
@@ -37,7 +41,7 @@ class PostController extends Controller{
             return response()->json(['message' => 'Post Not Found'], 404);
         }
 
-        return response()->json([$posts], 201);
+        return response()->json([$posts], 200);
     }
 
     public function create(PostRequest $request){
@@ -56,6 +60,7 @@ class PostController extends Controller{
     }
 
     public function validatePost(Request $request, $id){
+        $this->authorizeRole(['admin', 'super_admin']);
         $post = Post::find($id);
 
         if(!$post){
@@ -63,13 +68,21 @@ class PostController extends Controller{
         }
 
         $request->validate([
-            'status' => 'required|in:allow,deny'
+            'status' => 'required|in:allow,deny',
         ]);
 
         $post->status = $request->input('status');
         $post->approve_at = $request->input('status') === 'allow' ? now() : null;
+        $post->approve_by = Auth::id();
         $post->save();
 
         return response()->json(['message' => 'Post status updated successfully', 'Post' => $post], 201);
+    }
+
+    private function authorizeRole(array $roles)
+    {
+        if (!Auth::user() || !Auth::user()->hasAnyRole($roles)) {
+            abort(403, 'Unauthorized');
+        }
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class PaperTypeController extends Controller
 {
     public function getPaperTypes(){
-        $paperTypes = PaperType::paginate(6);
+        $paperTypes = PaperType::paginate(5);
         return response()->json($paperTypes);
     }
 
@@ -38,6 +38,16 @@ class PaperTypeController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function destroy($id)
+    {
+        $this->authorizeRole(['super_admin', 'admin']);
+
+        $faculty = PaperType::findOrFail($id);
+        $faculty->delete();
+
+        return response()->json(['message' => 'Paper Type deleted successfully.']);
     }
 
     private function authorizeRole(array $roles)

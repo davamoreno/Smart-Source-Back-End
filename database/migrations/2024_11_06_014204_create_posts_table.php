@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->enum('status', ['pending', 'allow', 'deny'])->default('pending');
 
-            $table->timestamp('approve_at');
+            $table->timestamp('approve_at')->nullable();
             $table->timestamps();
         });
     }

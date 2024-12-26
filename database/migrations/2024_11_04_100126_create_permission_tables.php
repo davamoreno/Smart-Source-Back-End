@@ -126,6 +126,7 @@ return new class extends Migration
                 'email' => 'davamoreno28@gmail.com',
                 'password' => bcrypt('22446688'),
             ]);
+
     
             $super_admin->assignRole(UserRole::SUPER_ADMIN->value);
         });

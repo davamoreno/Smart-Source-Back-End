@@ -60,7 +60,7 @@ class Post extends Model
     }
 
     public function reports(){
-        return $this->hasMany(Report::class);
+        return $this->hasMany(Report::class, 'post_id');
     } 
 
     public function file(){

@@ -9,6 +9,8 @@ class Report extends Model
     protected $fillable = [
         'reason',
         'status',
+        'user_id',
+        'post_id',
         'handled_at'
     ];
 

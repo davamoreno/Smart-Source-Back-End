@@ -10,8 +10,13 @@ use Spatie\Permission\Models\Role;
 
 class CategoryController extends Controller
 {
-    public function index(){
-        $categories = Category::paginate(5);
+    public function index(Request $request){
+        if($request->has('all') && $request->all === 'true') {
+          $categories = Category::select('id', 'name')->get();  
+        }
+        else{
+            $categories = Category::paginate(5);
+        }
         return response()->json($categories);
     }
 

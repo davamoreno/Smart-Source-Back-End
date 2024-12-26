@@ -12,9 +12,14 @@ use Spatie\Permission\Models\Role;
 
 class UniversityController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $universities = University::paginate(9);
+        if ($request->has('all') && $request->all === 'true') {
+            $universities = University::select('id', 'name')->get();
+        } else {
+            $universities = University::paginate(10);
+        }
+    
         return response()->json($universities);
     }
 

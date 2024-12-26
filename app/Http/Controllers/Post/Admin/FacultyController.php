@@ -11,9 +11,13 @@ use Spatie\Permission\Models\Role;
 
 class FacultyController extends Controller
 {
-    public function index()
-    {
-        $faculties = Faculty::paginate(9);
+    public function index(Request $request)
+    {   
+        if($request->has('all') && $request->all === 'true'){
+            $faculties = Faculty::select('id', 'name')->get();
+        }else{
+            $faculties = Faculty::paginate(10);
+        }
         return response()->json($faculties);
     }
 

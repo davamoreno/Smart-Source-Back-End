@@ -10,7 +10,7 @@ use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class PostController extends Controller{
+class PostController extends Controller{    
 
     public function search(Request $request){
         $keyword = $request->input('keyword');
@@ -24,11 +24,23 @@ class PostController extends Controller{
         ], 200);
     }
 
-    public function getAllUserPost(){
-        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])
-                            ->where('status', 'allow')
-                            ->latest()
-                            ->get();
+    public function getAllUserPost(Request $request){
+        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])->latest();
+        if ($request->has('allow') && $request->allow === 'true') {
+            $posts = $posts->where('status', 'allow')->get();
+        }
+        else if($request->has('deny') && $request->deny === 'true') {
+            $posts = $posts->where('status', 'deny')->get();
+        }
+        else
+        {
+            $posts = $posts->where('status', 'pending')->get();
+        }
+
+        if (!$posts) {
+            return response()->json(['message' => 'Post Not Found'], 404);
+        }
+
         return response()->json($posts);
     }
 
@@ -59,7 +71,7 @@ class PostController extends Controller{
         return response()->json(['message' => 'Post Success Created, Please Wait For Admin Approvement', 'post' => $post], 201);
     }
 
-    public function validatePost(Request $request, $id){
+    public function validatePost(Request $request, Post $id){
         $this->authorizeRole(['admin', 'super_admin']);
         $post = Post::find($id);
 

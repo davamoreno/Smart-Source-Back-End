@@ -40,8 +40,9 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->group(function ()
 Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
     Route::get('/user/{id}/post', [Post\PostController::class, 'getUserPost']);
     Route::post('/create/post', [Post\PostController::class, 'create']);
-    Route::get('/user/profile', [Member\AuthController::class, 'getUserProfile']);
-    
+    Route::get('/user/profile/{id?}', [Member\AuthController::class, 'getUserProfile']);
+    Route::post('/member/image/{id}', [Member\AuthController::class, 'createUserImage']);
+
     Route::get('/private/files/{filename}', function (string $filename) {
         $filePath = 'files/'.$filename;
         if (!Storage::disk('local')->exists($filePath)) {

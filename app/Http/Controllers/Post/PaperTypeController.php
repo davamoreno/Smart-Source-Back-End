@@ -9,8 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 class PaperTypeController extends Controller
 {
-    public function getPaperTypes(){
-        $paperTypes = PaperType::paginate(5);
+    public function getPaperTypes(Request $request){
+        if ($request->has('all') && $request->all === 'true') {
+            $paperTypes = PaperType::select('id', 'name')->get();
+        }else{
+            $paperTypes = PaperType::paginate(5);
+        }
         return response()->json($paperTypes);
     }
 

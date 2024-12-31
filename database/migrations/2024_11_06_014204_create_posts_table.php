@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('description', 255);
             $table->string('slug')->unique();
             $table->enum('status', ['pending', 'allow', 'deny'])->default('pending');
+            $table->enum('report_status', ['null' , 'pending', 'accept', 'reject'])->default('null');
 
             $table->timestamp('approve_at')->nullable();
             $table->timestamps();

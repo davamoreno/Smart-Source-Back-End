@@ -33,17 +33,19 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->group(function ()
     Route::delete('/delete/category/{id}', [Post\CategoryController::class, 'destroy']);
     Route::delete('/delete/university/{id}', [Post\Admin\UniversityController::class, 'destroy']);
     Route::put('/post/validation/{id}', [Post\PostController::class, 'validatePost']);
-    Route::put('/post/report/handle/{id}', [Post\PostController::class, 'validatePostReport']);
+    Route::put('/post/report/handle/{id}', [Post\ReportController::class, 'validatePostReport']);
 });
 
 Route::get('/user/{id}/post', [Post\PostController::class, 'getUserPost']);
-
+Route::get('/post/report/{id}', [Post\ReportController::class, 'getReport']);
 //Member Features
 Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
     Route::post('/create/post', [Post\PostController::class, 'create']);
     Route::get('/user/profile/{id?}', [Member\AuthController::class, 'getUserProfile']);
     Route::post('/member/image/{id}', [Member\AuthController::class, 'createUserImage']);
-    Route::post('/post/report/{id}', [Post\PostController::class, 'userReportPost']);
+    Route::post('/post/report/{id}', [Post\ReportController::class, 'userReportPost']);
+    Route::post('/post/comment/{id}', [Post\CommentController::class, 'userComment']);
+    Route::get('/post/comment/{id}', [Post\CommentController::class, 'show']);
 
     Route::get('/private/files/{filename}', function (string $filename) {
         $filePath = 'files/'.$filename;

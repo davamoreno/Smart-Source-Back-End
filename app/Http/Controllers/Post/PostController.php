@@ -78,8 +78,22 @@ class PostController extends Controller{
         $this->authorizeRole(['admin', 'super_admin']);
         $post = Post::find($id);
 
-        if(!$post){
+        if(!$post)
+        {
             return response()->json(['message' => 'Post Not Found'], 404);
+        }
+
+        if ($post->report_status === 'accept' && $post->status === 'deny') 
+        {
+            return response()->json(['message' => 'This Post Has Been Taken Down'], 404);
+        }
+        else if ($post->status === 'deny') 
+        {
+            return response()->json(['message' => 'This Post Has Been Denied'], 404);
+        }
+        else if ($post->status === 'allow') 
+        {
+            return response()->json(['message' => 'This Post Has Been Allowed'], 404);
         }
 
         $request->validate([
@@ -92,58 +106,6 @@ class PostController extends Controller{
         $post->save();
 
         return response()->json(['message' => 'Post status updated successfully', 'Post' => $post], 201);
-    }
-
-    public function userReportPost(ReportRequest $request, $postId)
-    {
-        $post = Post::find($postId);
-
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
-        }
-        $existingReport = Report::where('post_id', $postId)->where('user_id', auth()->id())->first();
-
-        if ($existingReport) {
-            return response()->json(['message' => 'You have already reported this post'], 409);
-        }
-
-        $report = $post->reports()->create([
-            'reason' => $request->reason,
-            'user_id' => Auth::id(),
-            'status' => 'pending'
-        ]);
-
-        return response()->json(['message' => 'Report submitted successfully', 'report' => $report], 201);
-    }
-
-    public function validatePostReport(Request $request, $id)
-    {
-        $this->authorizeRole(['admin', 'super_admin']);
-        $post = Post::find($id);
-
-        if(!$post){
-            return response()->json(['message' => 'Post Not Found'], 404);
-        }
-
-        $reports = Report::where('post_id', $id)->get();
-
-        if ($reports->isEmpty()) {
-            return response()->json(['message' => 'No pending reports for this post'], 404);
-        }
-
-        $request->validate([
-            'status' => 'required|in:accept,reject'
-        ]);
-
-        foreach($reports as $report){
-            $report->update([
-                $report->status = $request->input('status'),
-                $report->handled_at = now()
-            ]);
-        }
-
-        return response()->json(['message' => 'success', 'report' => $reports], 200);
-        
     }
 
     private function authorizeRole(array $roles)

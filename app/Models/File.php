@@ -10,7 +10,8 @@ class File extends Model
     protected $fillable = [
         'file_name',
         'file_path',
-        'file_size'
+        'file_size',
+        'file_type'
     ];
 
     public function post(){

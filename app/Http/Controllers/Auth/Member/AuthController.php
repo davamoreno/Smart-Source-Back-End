@@ -13,10 +13,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller{
+
+    public function getUser(){
+        $user = Auth::user();
+        return response()->json($user);
+    }
     
     public function getUserProfile($id = null){
         if (!$id) {
-            $user = auth()->user();
+            $user = auth()->user()->load('userProfile');
         } else {
             $user = User::with('userProfile')->find($id);
         }
@@ -73,15 +78,59 @@ class AuthController extends Controller{
 
     public function createUserImage(Request $request){
 
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+    
         $filePath = $request->file('user_profile')->store('profiles', 'public');
-        $userProfile = new UserProfile([
-            'file_name' => $request->file('user_profile')->getClientOriginalName(),
-            'file_path' => $filePath,
-            'file_size' => $request->file('user_profile')->getSize()
-        ]);
-        $user = auth()->user();
-        $user->userProfile()->save($userProfile);
+    
+        if ($user->userProfile) {
+            $user->userProfile->update([
+                'file_name' => $request->file('user_profile')->getClientOriginalName(),
+                'file_path' => $filePath,
+                'file_size' => $request->file('user_profile')->getSize(),
+            ]);
+        } else {
+            $user->userProfile()->create([
+                'file_name' => $request->file('user_profile')->getClientOriginalName(),
+                'file_path' => $filePath,
+                'file_size' => $request->file('user_profile')->getSize(),
+            ]);
+        }
+    
+        return response()->json([
+            'message' => 'User Image Successfully Uploaded',
+            'user' => $user,
+        ], 201);
 
         return response()->json(['message' => 'User Image Success Uploaded', 'user' => $user], 201);
     }
+
+    public function editProfile(Request $request){
+        if (!Auth::check()) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+
+        $request->validate([
+            'username' => 'required|string|max:255|unique:users,username,' . Auth::id(),
+        ]);
+
+        $user = Auth::user();
+
+        if ($user) {
+            $user->update([
+                'username' => $request->username,
+            ]);
+
+            return response()->json([
+                'message' => 'Your Profile Updated Successfully',
+                'user' => $user,
+            ], 200);
+        }
+
+    return response()->json(['message' => 'User not found'], 404);
+    }
+    
 }

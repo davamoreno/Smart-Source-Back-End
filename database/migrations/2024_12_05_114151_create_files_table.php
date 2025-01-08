@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('files', function (Blueprint $table) {
             $table->id();
             $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
-            $table->enum('file_type', ['docx', 'pdf', 'excel']);
+            $table->string('file_type');
             $table->string('file_path');
             $table->string('file_name');
             $table->integer('file_size');

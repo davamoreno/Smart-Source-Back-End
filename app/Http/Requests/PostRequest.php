@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PostRequest extends FormRequest
@@ -11,7 +12,7 @@ class PostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->exists;
+        return auth()->user()->exists && auth()->user()->faculty()->exists;
     }
 
     /**

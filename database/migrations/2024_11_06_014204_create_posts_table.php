@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('category_id')->nullable()->constrained('categories')->cascadeOnDelete();
             $table->foreignId('approve_by')->nullable()->constrained('users')->nullOnDelete();
 
+            $table->bigInteger('likes_count')->default(0);
             $table->string('title', 255);
             $table->string('description', 255);
             $table->string('slug')->unique();

@@ -26,23 +26,32 @@ class PostController extends Controller{
         ], 200);
     }
 
-    public function getAllUserPost(Request $request){
-        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])->latest();
-        if ($request->has('allow') && $request->allow === 'true') {
-            $posts = $posts->where('status', 'allow')->get();
-        }
-        else if($request->has('deny') && $request->deny === 'true') {
-            $posts = $posts->where('status', 'deny')->get();
-        }
-        else
-        {
-            $posts = $posts->where('status', 'pending')->get();
-        }
-
+    public function showUserPost(Request $request){
+        $perPage = $request->input('per_page', 10);
+        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])->where('status', 'allow')->latest()->paginate($perPage);
         if (!$posts) {
             return response()->json(['message' => 'Post Not Found'], 404);
         }
 
+        return response()->json($posts);
+    }
+
+    public function showPostPending()
+    {
+        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])->where('status', 'pending') ->orderBy('created_at', 'asc')->paginate(10);
+        if ($posts->isEmpty()) {
+            return response()->json(['message' => 'Post Not Found'], 404);
+        }
+    
+        return response()->json($posts);
+    }
+
+    public function showDenyPost(){
+        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])->latest();
+        $posts = $posts->where('status', 'deny')->paginate(10);
+        if (!$posts) {
+            return response()->json(['message' => 'Post Not Found'], 404);
+        }
         return response()->json($posts);
     }
 
@@ -64,14 +73,17 @@ class PostController extends Controller{
         auth()->user()->posts()->save($post);
 
         if($request->hasFile('file')){
-            $filePath = $request->file('file')->store('files');
+            $file = $request->file('file');
+            $filePath = $file->store('files', 'public');
+            $fileType = $file->getClientMimeType();
             $post->file()->create([
                 'file_name' => $request->file('file')->getClientOriginalName(),
                 'file_path' => $filePath,
-                'file_size' => $request->file('file')->getSize()
+                'file_size' => $request->file('file')->getSize(),
+                'file_type' => $fileType
             ]);
         }
-        return response()->json(['message' => 'Post Success Created, Please Wait For Admin Approvement', 'post' => $post], 201);
+        return response()->json(['message' => 'Post Success Created, Please Wait For Admin Approvement', 'post' => $post ], 201);
     }
 
     public function validatePost(Request $request, $id){

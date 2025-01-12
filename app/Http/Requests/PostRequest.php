@@ -12,7 +12,7 @@ class PostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->exists && auth()->user()->faculty()->exists;
+        return auth()->user()->exists;
     }
 
     /**

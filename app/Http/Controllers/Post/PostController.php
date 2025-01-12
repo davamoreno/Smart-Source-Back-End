@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Post;
 
-use App\Http\Controllers\Controller;
+use App\Models\File;
+use App\Models\Post;
+use App\Models\User;
+use App\Models\Report;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ReportRequest;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Post;
-use App\Models\File;
-use App\Models\Report;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class PostController extends Controller{    
 
@@ -28,7 +29,18 @@ class PostController extends Controller{
 
     public function showUserPost(Request $request){
         $perPage = $request->input('per_page', 10);
-        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])->where('status', 'allow')->latest()->paginate($perPage);
+        $posts = Post::with([
+            'user', 'category', 'paperType', 'file', 'approvedBy', 
+            'likes' => function ($query) {
+                $query->where('user_id', auth('sanctum')->user()?->id);
+            }])->where('status', 'allow')
+               ->latest()
+               ->paginate($perPage)
+               ->through(function ($post) {
+                    $post->like = !$post->likes?->isEmpty();
+                    return $post;
+            });
+
         if (!$posts) {
             return response()->json(['message' => 'Post Not Found'], 404);
         }
@@ -38,7 +50,7 @@ class PostController extends Controller{
 
     public function showPostPending()
     {
-        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])->where('status', 'pending') ->orderBy('created_at', 'asc')->paginate(10);
+        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])->where('status', 'pending')->orderBy('created_at', 'asc')->paginate(10);
         if ($posts->isEmpty()) {
             return response()->json(['message' => 'Post Not Found'], 404);
         }
@@ -55,17 +67,31 @@ class PostController extends Controller{
         return response()->json($posts);
     }
 
-    public function getUserPost(Request $request, $id){
-        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy']);
-            if($request->has('allow') && $request->allow === 'true') {
-                $posts = $posts->where('status', 'allow')->find($id);
-            }
+    public function getUserPost($id){
+        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy', 'likes' => function ($query) {
+            $query->where('user_id', auth('sanctum')->user()?->id);
+        }]);
+        
+        $posts = $posts->where('status', 'allow')->find($id);
+
+        $posts->like = !$posts->likes?->isEmpty();
 
         if (!$posts) {
             return response()->json(['message' => 'Post Not Found'], 404);
         }
 
         return response()->json([$posts], 200);
+    }
+
+    public function getMyPost(){
+        $user = Auth::user();
+        $posts = $user->posts()->with(['category', 'paperType', 'file', 'approvedBy'])->get();
+
+        if ($posts->isEmpty()) {
+            return response()->json(['message' => 'No posts found'], 404);
+        }
+
+        return response()->json(['posts' => $posts], 200);
     }
 
     public function create(PostRequest $request){

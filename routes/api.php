@@ -35,25 +35,28 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->group(function ()
     Route::get('/post/pending', [Post\PostController::class, 'showPostPending']);
     Route::put('/post/validation/{id}', [Post\PostController::class, 'validatePost']);
     Route::put('/post/report/handle/{id}', [Post\ReportController::class, 'validatePostReport']);
+    Route::get('/post/report/pending', [Post\ReportController::class, 'getAllReport']);
+    
 });
 
-Route::get('/user/{id}/post', [Post\PostController::class, 'getUserPost']);
+Route::get('/user/post/{id}', [Post\PostController::class, 'getUserPost']);
 Route::get('/post/report/{id}', [Post\ReportController::class, 'getReport']);
 //Member Features
 Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
     Route::post('/create/post', [Post\PostController::class, 'create']);
-    Route::get('/user/profile/{id?}', [Member\AuthController::class, 'getUserProfile']);
+    Route::get('/user/profile', [Member\AuthController::class, 'getUserProfile']);
     Route::post('/member/image', [Member\AuthController::class, 'createUserImage']);
     Route::post('/post/report/{id}', [Post\ReportController::class, 'userReportPost']);
     Route::post('/post/comment/{id}', [Post\CommentController::class, 'userComment']);
     Route::get('/post/comment/{id}', [Post\CommentController::class, 'show']);
-    Route::put('/edit/profile', [Member\AuthController::class, 'editProfile']);
     Route::post('/edit/profileImage', [Member\AuthController::class, 'editUserImage']);
     Route::get('/post/bookmark', [Post\BookmarkController::class, 'show']);
     Route::post('/post/bookmark/{post}', [Post\BookmarkController::class, 'create']);
     Route::delete('/post/bookmark/{post}', [Post\BookmarkController::class, 'delete']);
     Route::post('/post/like/{post}', [Post\LikeController::class, 'create']);
     Route::delete('/post/like/{post}', [Post\LikeController::class, 'delete']);
+    Route::get('/user/mypost', [Post\PostController::class, 'getMyPost']);
+    Route::post('/user/edit/profile', [Member\AuthController::class, 'updateProfile']);
 
 
     Route::get('public/files/{filename}', function (string $filename) {

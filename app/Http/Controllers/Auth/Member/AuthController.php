@@ -19,12 +19,9 @@ class AuthController extends Controller{
         return response()->json($user);
     }
     
-    public function getUserProfile($id = null){
-        if (!$id) {
-            $user = auth()->user()->load('userProfile');
-        } else {
-            $user = User::with('userProfile')->find($id);
-        }
+    public function getUserProfile(){
+        $user = Auth::user();
+        $user->load(['userProfile', 'faculty.university']);
         return response()->json($user);
     }
 
@@ -33,8 +30,7 @@ class AuthController extends Controller{
             $user = new User([
                 'username' => $request->username,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'faculty_id' => $request->faculty_id,
+                'password' => Hash::make($request->password)
             ]);
 
             $user->assignRole(UserRole::MEMBER->value);
@@ -108,29 +104,38 @@ class AuthController extends Controller{
         return response()->json(['message' => 'User Image Success Uploaded', 'user' => $user], 201);
     }
 
-    public function editProfile(Request $request){
-        if (!Auth::check()) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
+    public function updateProfile(Request $request){
+    if (!Auth::check()) {
+        return response()->json(['message' => 'User not authenticated'], 401);
+    }
 
-        $request->validate([
-            'username' => 'required|string|max:255|unique:users,username,' . Auth::id(),
+    $request->validate([
+        'username' => 'required|string|max:255|unique:users,username,' . Auth::id(),
+        'faculty_id' => 'nullable|exists:faculties,id',
+    ]);
+
+    $user = Auth::user();
+
+    if ($user) {
+        $user->update([
+            'username' => $request->username,
         ]);
-
-        $user = Auth::user();
 
         if ($user) {
             $user->update([
-                'username' => $request->username,
+                'faculty_id' => $request->faculty_id,
             ]);
-
-            return response()->json([
-                'message' => 'Your Profile Updated Successfully',
-                'user' => $user,
-            ], 200);
+        } else {
+            $user->create([
+                'faculty_id' => $request->faculty_id,
+            ]);
         }
 
-    return response()->json(['message' => 'User not found'], 404);
+        return response()->json([
+            'message' => 'Username and Faculty updated successfully',
+            'user' => $user->load('userProfile'),
+        ], 200);
     }
-    
-}
+
+    return response()->json(['message' => 'User not found'], 404);
+}}

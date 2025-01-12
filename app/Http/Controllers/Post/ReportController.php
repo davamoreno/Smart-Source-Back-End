@@ -25,6 +25,13 @@ class ReportController extends Controller
         ], 200);
     }
 
+    public function getAllReport(){
+        $post = Post::with('reports')->where('report_status', 'pending')->orderBy('created_at', 'desc')->paginate(10);
+        return response()->json([
+            'post' => $post
+        ], 200);
+    }
+
     public function userReportPost(ReportRequest $request, $postId)
     {
         $post = Post::find($postId);

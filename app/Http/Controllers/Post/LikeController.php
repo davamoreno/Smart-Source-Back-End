@@ -6,6 +6,7 @@ use App\Models\Like;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class LikeController extends Controller
@@ -21,7 +22,7 @@ class LikeController extends Controller
             ]);
         }
         $like = Like::firstOrCreate([
-            'user_id' => auth()->user()->id,
+            'user_id' => Auth::id(),
             'post_id' => $post->id
         ]);
 

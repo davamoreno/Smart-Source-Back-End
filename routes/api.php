@@ -39,8 +39,9 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->group(function ()
     
 });
 
-Route::get('/user/post/{id}', [Post\PostController::class, 'getUserPost']);
+Route::get('/user/post/{slug}', [Post\PostController::class, 'getDetailPost']);
 Route::get('/post/report/{id}', [Post\ReportController::class, 'getReport']);
+
 //Member Features
 Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
     Route::post('/create/post', [Post\PostController::class, 'create']);
@@ -53,8 +54,8 @@ Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
     Route::get('/post/bookmark', [Post\BookmarkController::class, 'show']);
     Route::post('/post/bookmark/{post}', [Post\BookmarkController::class, 'create']);
     Route::delete('/post/bookmark/{post}', [Post\BookmarkController::class, 'delete']);
-    Route::post('/post/like/{post}', [Post\LikeController::class, 'create']);
-    Route::delete('/post/like/{post}', [Post\LikeController::class, 'delete']);
+    Route::post('/post/like/{slug}', [Post\LikeController::class, 'create']);
+    Route::delete('/post/like/{slug}', [Post\LikeController::class, 'delete']);
     Route::get('/user/mypost', [Post\PostController::class, 'getMyPost']);
     Route::post('/user/edit/profile', [Member\AuthController::class, 'updateProfile']);
 

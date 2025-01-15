@@ -15,7 +15,8 @@ class LikeController extends Controller
        return response()->json($post->likes->load('user')->pluck('user'));
     }
 
-    public function create(Post $post){
+    public function create($slug){
+        $post = Post::where('slug', $slug)->firstOrFail();
         if ($post->status !== 'allow') {
             throw ValidationException::withMessages([
                 'status' => 'Status is not allowed'
@@ -35,7 +36,9 @@ class LikeController extends Controller
         ], 201);
     }
     
-    public function delete(Post $post){
+    public function delete($slug){
+        $post = Post::where('slug', $slug)->firstOrFail();
+
         Like::where('user_id', auth()->user()->id)
                 ->where('post_id', $post->id)
                 ->firstOrFail()

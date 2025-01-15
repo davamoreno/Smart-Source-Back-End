@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Post;
 
+
 use App\Models\File;
 use App\Models\Post;
 use App\Models\User;
@@ -12,6 +13,7 @@ use App\Http\Requests\PostRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReportRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller{    
 
@@ -30,16 +32,24 @@ class PostController extends Controller{
     public function showUserPost(Request $request){
         $perPage = $request->input('per_page', 10);
         $posts = Post::with([
-            'user', 'category', 'paperType', 'file', 'approvedBy', 
+            'user',
+            'category', 
+            'paperType', 
+            'file', 
+            'approvedBy', 
             'likes' => function ($query) {
                 $query->where('user_id', auth('sanctum')->user()?->id);
-            }])->where('status', 'allow')
+            },
+            'bookmarks' => function($query){
+                $query->where('user_id', auth('sanctum')->user()?->id);
+            }
+            ])->where('status', 'allow')
                ->latest()
-               ->paginate($perPage)
-               ->through(function ($post) {
+               ->paginate($perPage)->through(function ($post) {
                     $post->like = !$post->likes?->isEmpty();
+                    $post->bookmark = !$post->bookmarks?->isEmpty();
                     return $post;
-            });
+                });
 
         if (!$posts) {
             return response()->json(['message' => 'Post Not Found'], 404);
@@ -67,20 +77,29 @@ class PostController extends Controller{
         return response()->json($posts);
     }
 
-    public function getUserPost($id){
-        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy', 'likes' => function ($query) {
-            $query->where('user_id', auth('sanctum')->user()?->id);
-        }]);
+    public function getDetailPost($slug){
+        $post = Post::with([
+            'user', 
+            'category', 
+            'paperType', 
+            'file', 
+            'approvedBy', 
+            'likes' => function ($query) {
+                $query->where('user_id', auth('sanctum')->user()?->id);
+            },
+            'bookmarks' => function($query){
+                $query->where('user_id', auth('sanctum')->user()?->id);
+            }
+        ])->where('slug', $slug)
+          ->where('status', 'allow')
+          ->first();
         
-        $posts = $posts->where('status', 'allow')->find($id);
-
-        $posts->like = !$posts->likes?->isEmpty();
-
-        if (!$posts) {
+        if (!$post) {
             return response()->json(['message' => 'Post Not Found'], 404);
         }
-
-        return response()->json([$posts], 200);
+        $post->like = !$post->likes?->isEmpty();
+        $post->bookmark = !$post->bookmarks?->isEmpty();
+        return response()->json($post, 200);
     }
 
     public function getMyPost(){

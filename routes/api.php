@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Http\Request;
-use App\HTTP\Controllers\Post;
-use App\HTTP\Controllers\Auth\Admin;
-use App\HTTP\Controllers\Auth\Member;
+use App\Http\Controllers\Post;
+use App\Http\Controllers\Auth\Admin;
+use App\Http\Controllers\Auth\Member;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;

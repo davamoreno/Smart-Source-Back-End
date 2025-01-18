@@ -57,7 +57,8 @@ class AuthController extends Controller{
             return true;
         })) {
             throw ValidationException::withMessages([
-                'identifier' => ['Wrong Email or Username/Password'],
+                'identifier' => ['Wrong Email or Username'],
+                'password' => ['Wrong Password']
             ]);
         }
 

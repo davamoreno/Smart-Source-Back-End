@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReportRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller{    
 
@@ -104,7 +105,12 @@ class PostController extends Controller{
 
     public function getMyPost(){
         $user = Auth::user();
-        $posts = $user->posts()->with(['category', 'paperType', 'file', 'approvedBy'])->get();
+        $posts = $user->posts()->with([
+        'category', 
+        'paperType', 
+        'file', 
+        'approvedBy'
+        ])->get();
 
         if ($posts->isEmpty()) {
             return response()->json(['message' => 'No posts found'], 404);
@@ -165,8 +171,64 @@ class PostController extends Controller{
         return response()->json(['message' => 'Post status updated successfully', 'Post' => $post], 201);
     }
 
-    private function authorizeRole(array $roles)
-    {
+    public function update(PostRequest $request, $slug) {
+        $post = Post::where('slug', $slug)
+            ->where('status', 'pending')
+            ->where('user_id', auth()->user()->id)
+            ->first();
+
+        if (!$post) {
+            return response()->json(['message' => 'Post not found or cannot be updated'], 404);
+        }
+
+        $post->fill($request->only(['title', 'description', 'category_id', 'paper_type_id']));
+
+        $post->save();
+
+        if ($request->hasFile('file')) {
+            if ($post->file) {
+                Storage::disk('public')->delete($post->file->file_path);
+                $post->file()->delete();
+            }
+
+            $file = $request->file('file');
+            $filePath = $file->store('files', 'public');
+            $fileType = $file->getClientMimeType();
+
+            $post->file()->create([
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $filePath,
+                'file_size' => $file->getSize(),
+                'file_type' => $fileType,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Post updated successfully',
+            'post' => $post,
+        ], 200);
+    }
+
+    public function delete($slug) {
+        $post = Post::where('slug', $slug)
+            ->where('user_id', auth()->user()->id)
+            ->first();
+
+        if (!$post) {
+            return response()->json(['message' => 'Post not found or you are not authorized to delete this post'], 404);
+        }
+
+        if ($post->file) {
+            Storage::disk('public')->delete($post->file->file_path);
+            $post->file()->delete();
+        }
+
+        $post->delete();
+        return response()->json(['message' => 'Post deleted successfully'], 200);
+    }
+
+
+    private function authorizeRole(array $roles) {
         if (!Auth::user() || !Auth::user()->hasAnyRole($roles)) {
             abort(403, 'Unauthorized');
         }

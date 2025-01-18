@@ -21,7 +21,7 @@ class AuthController extends Controller{
     public function register(UserRequest $request){
         try{
             if (!Auth::user()->hasRole('super_admin')) {
-                return response()->json(['message' => 'Unauthorized. Only SUPER_ADMIN can create ADMIN users.'], 403);
+                return response()->json(['message' => 'Unauthorized. Only Super Admin can create Admin Role.'], 403);
             }
         
             $user = new User([

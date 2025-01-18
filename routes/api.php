@@ -36,7 +36,6 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->group(function ()
     Route::put('/post/validation/{id}', [Post\PostController::class, 'validatePost']);
     Route::put('/post/report/handle/{id}', [Post\ReportController::class, 'validatePostReport']);
     Route::get('/post/report/pending', [Post\ReportController::class, 'getAllReport']);
-    
 });
 
 Route::get('/user/post/{slug}', [Post\PostController::class, 'getDetailPost']);
@@ -58,7 +57,8 @@ Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
     Route::delete('/post/like/{slug}', [Post\LikeController::class, 'delete']);
     Route::get('/user/mypost', [Post\PostController::class, 'getMyPost']);
     Route::post('/user/edit/profile', [Member\AuthController::class, 'updateProfile']);
-
+    Route::put('/user/post/edit/{slug}',  [Post\PostController::class, 'update']);
+    Route::delete('/user/post/delete/{slug}', [Post\PostController::class, 'delete']);
 
     Route::get('public/files/{filename}', function (string $filename) {
         $filePath = 'files/'.$filename;
@@ -71,6 +71,8 @@ Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
 
         return response($fileContent, 200)->header('Content-Type', $mimeType);
     });
+
+    Route::post('/user/history/{slug}', [Post\HistoryController::class, 'create']);
 });
 
 Route::get('/post/like/{post}', [Post\LikeController::class, 'show']);

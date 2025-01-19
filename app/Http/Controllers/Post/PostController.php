@@ -18,20 +18,16 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller{    
 
-    public function search(Request $request){
-        $keyword = $request->input('keyword');
-
-        $post = Post::where('title', 'LIKE', '%' . $keyword . '%')->paginate(10);
-
-        return response()->json([
-            'success' => true,
-            'data' => $post,
-            'message' => 'Search results retrieved successfully',
-        ], 200);
-    }
-
     public function showUserPost(Request $request){
         $perPage = $request->input('per_page', 10);
+        $keyword = $request->input('keyword');
+        $sortBy = $request->input('sort_by');
+        $sortOrder = $request->input('sort_order', 'asc');
+        $categoryId = $request->input('category_id');
+        $paperTypeId = $request->input('paper_type_id');
+
+        $validSortColumns = ['title', 'created_at', 'category_id', 'paper_type_id'];
+
         $posts = Post::with([
             'user',
             'category', 
@@ -44,15 +40,34 @@ class PostController extends Controller{
             'bookmarks' => function($query){
                 $query->where('user_id', auth('sanctum')->user()?->id);
             }
-            ])->where('status', 'allow')
-               ->latest()
-               ->paginate($perPage)->through(function ($post) {
-                    $post->like = !$post->likes?->isEmpty();
-                    $post->bookmark = !$post->bookmarks?->isEmpty();
-                    return $post;
-                });
+        ])->where('status', 'allow')->latest();
 
-        if (!$posts) {
+        if ($keyword) {
+            $posts->where(function ($subQuery) use ($keyword) {
+                $subQuery->where('title', 'LIKE', '%' . $keyword . '%')
+                         ->orWhere('description', 'LIKE', '%' . $keyword . '%');
+            });
+        }
+
+        if ($categoryId) {
+            $posts->where('category_id', $categoryId);
+        }
+
+        if ($paperTypeId) {
+            $posts->where('paper_type_id', $paperTypeId);
+        }
+
+        if ($sortBy && in_array($sortBy, $validSortColumns)) {
+            $posts->orderBy($sortBy, $sortOrder);
+        }
+
+        $posts = $posts->paginate($perPage)->through(function ($post) {
+            $post->like = !$post->likes?->isEmpty();
+            $post->bookmark = !$post->bookmarks?->isEmpty();
+            return $post;
+        });
+
+        if ($posts->isEmpty()) {
             return response()->json(['message' => 'Post Not Found'], 404);
         }
 
@@ -98,6 +113,7 @@ class PostController extends Controller{
         if (!$post) {
             return response()->json(['message' => 'Post Not Found'], 404);
         }
+
         $post->like = !$post->likes?->isEmpty();
         $post->bookmark = !$post->bookmarks?->isEmpty();
         return response()->json($post, 200);

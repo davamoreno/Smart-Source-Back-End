@@ -20,4 +20,9 @@ class University extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function users()
+    {
+        return $this->hasManyThrough(User::class, Faculty::class);
+    }
 }

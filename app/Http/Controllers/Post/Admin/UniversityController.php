@@ -15,13 +15,16 @@ class UniversityController extends Controller
     public function index(Request $request)
     {
         if ($request->has('all') && $request->all === 'true') {
-            $universities = University::select('id', 'name')->get();
+            $universities = University::withCount(['faculities', 'users'])
+                ->get();
         } else {
-            $universities = University::paginate(10);
+            $universities = University::withCount(['faculities', 'users'])
+                ->paginate(10);
         }
     
         return response()->json($universities);
     }
+    
 
     public function store(Request $request)
     {

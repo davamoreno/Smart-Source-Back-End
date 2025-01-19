@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class BookmarkController extends Controller
 {
     public function show(){
-        $bookmarks = auth()->user()->bookmarks->load('post');
+        $bookmarks = auth()->user()->bookmarks->load('post', 'user', 'post.category', 'post.paperType');
 
         return response()->json($bookmarks);
     }

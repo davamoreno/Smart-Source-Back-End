@@ -99,19 +99,15 @@ class PostController extends Controller{
             'category', 
             'paperType', 
             'file', 
-            'approvedBy', 
+            'approvedBy',
+            'comments',
+            'comments.replies', 
             'likes' => function ($query) {
                 $query->where('user_id', auth('sanctum')->user()?->id);
             },
             'bookmarks' => function($query){
                 $query->where('user_id', auth('sanctum')->user()?->id);
             },
-            'comments' => function($query){
-                $query->where('user_id', auth('sanctum')->user()?->id);
-            },
-            'comments.replies' => function($query){
-                $query->where('user_id', auth('sanctum')->user()?->id);
-            }
         ])->where('slug', $slug)
           ->where('status', 'allow')
           ->first();
@@ -232,9 +228,7 @@ class PostController extends Controller{
     }
 
     public function delete($slug) {
-        $post = Post::where('slug', $slug)
-            ->where('user_id', auth()->user()->id)
-            ->first();
+        $post = Post::where('slug', $slug)->where('user_id', auth()->user()->id)->firstOrFail();
 
         if (!$post) {
             return response()->json(['message' => 'Post not found or you are not authorized to delete this post'], 404);

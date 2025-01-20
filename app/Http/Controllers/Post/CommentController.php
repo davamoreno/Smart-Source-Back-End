@@ -11,8 +11,8 @@ use App\Http\Requests\CommentRequest;
 
 class CommentController extends Controller
 {
-    public function userComment(CommentRequest $request, $id){
-        $post = Post::findOrFail($id);
+    public function mainComment(CommentRequest $request, $slug){
+        $post = Post::where('slug', $slug)->firstOrFail();
 
         if (!$post) {
             return response()->json([
@@ -26,28 +26,50 @@ class CommentController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        if (!$request->parent_id) {
-            $comment->update(['parent_id' => $comment->id]);
-        } else {
-            $parentComment = Comment::find($request->parent_id);
-            if (!$parentComment || $parentComment->post_id != $id) {
-                return response()->json([
-                    'message' => 'Invalid parent comment'
-                ], 400);
-            }
-            $comment->update(['parent_id' => $request->parent_id]);
-        }
-
         return response()->json([
-            'message' => 'Comment successfully uploaded',
+            'message' => 'Main Comment successfully uploaded',
             'comment' => $comment
         ], 201);
     }
 
-    public function show($id)
+    public function addReplyComment(CommentRequest $request, $slug, $parent_id)
     {
-        $comment = Comment::with('replies')->findOrFail($id);
+        $post = Post::where('slug', $slug)->firstOrFail();
+        $parentComment = Comment::find($parent_id);
     
-        return response()->json($comment);
+        if (!$post) {
+            return response()->json([
+                'message' => 'Post Not Found'
+            ], 404);
+        }
+  
+        if (!$parentComment || $parentComment->post_id != $post->id) {
+            return response()->json([
+                'message' => 'Invalid parent comment'
+            ], 400);
+        }
+    
+        $comment = $post->comments()->create([
+            'content' => $request->content,
+            'parent_id' => $parent_id,
+            'user_id' => Auth::id(),
+        ]);
+    
+        return response()->json([
+            'message' => 'Reply comment successfully uploaded',
+            'comment' => $comment
+        ], 201);
+    }
+
+    public function show($slug) {
+        $post = Post::where('slug', $slug)
+            ->with([
+                'comments.user', 
+                'comments.user.userProfile', 
+                'comments.replies'
+            ])
+            ->firstOrFail();
+
+        return response()->json($post);
     }
 }

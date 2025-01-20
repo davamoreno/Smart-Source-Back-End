@@ -105,6 +105,12 @@ class PostController extends Controller{
             },
             'bookmarks' => function($query){
                 $query->where('user_id', auth('sanctum')->user()?->id);
+            },
+            'comments' => function($query){
+                $query->where('user_id', auth('sanctum')->user()?->id);
+            },
+            'comments.replies' => function($query){
+                $query->where('user_id', auth('sanctum')->user()?->id);
             }
         ])->where('slug', $slug)
           ->where('status', 'allow')

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 //Member Auth
 Route::post('/member/register', [Member\AuthController::class, 'register']);
-Route::post('/member/login',    [Member\AuthController::class, 'login']);
+Route::post('/member/login', [Member\AuthController::class, 'login']);
 Route::middleware(['auth:sanctum', 'role:member'])->post('/member/logout', [Member\AuthController::class, 'logout']);
 
 //Super Admin Create Admin
@@ -47,8 +47,9 @@ Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
     Route::get('/user/profile', [Member\AuthController::class, 'getUserProfile']);
     Route::post('/member/image', [Member\AuthController::class, 'createUserImage']);
     Route::post('/post/report/{id}', [Post\ReportController::class, 'userReportPost']);
-    Route::post('/post/comment/{id}', [Post\CommentController::class, 'userComment']);
-    Route::get('/post/comment/{id}', [Post\CommentController::class, 'show']);
+    Route::post('/post/comment/{slug}', [Post\CommentController::class, 'mainComment']);
+    Route::post('/post/comment/{slug}/{parent_id}', [Post\CommentController::class, 'addReplyComment']);
+    Route::get('/post/comment/{slug}', [Post\CommentController::class, 'show']);
     Route::post('/edit/profileImage', [Member\AuthController::class, 'editUserImage']);
     Route::get('/post/bookmark', [Post\BookmarkController::class, 'show']);
     Route::post('/post/bookmark/{post}', [Post\BookmarkController::class, 'create']);

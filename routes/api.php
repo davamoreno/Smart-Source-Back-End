@@ -32,6 +32,7 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->group(function ()
     Route::delete('/delete/papertype/{id}', [Post\PaperTypeController::class, 'destroy']);
     Route::delete('/delete/category/{id}', [Post\CategoryController::class, 'destroy']);
     Route::delete('/delete/university/{id}', [Post\Admin\UniversityController::class, 'destroy']);
+    Route::delete('/delete/faculty/{id}', [Post\Admin\FacultyController::class, 'destroy']);
     Route::get('/post/pending', [Post\PostController::class, 'showPostPending']);
     Route::put('/post/validation/{id}', [Post\PostController::class, 'validatePost']);
     Route::put('/post/report/handle/{id}', [Post\ReportController::class, 'validatePostReport']);

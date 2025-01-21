@@ -26,50 +26,87 @@ class CommentController extends Controller
             'user_id' => Auth::id(),
         ]);
 
+        $comment->update([
+            'parent_id' => $comment->id,
+        ]);
+
         return response()->json([
             'message' => 'Main Comment successfully uploaded',
             'comment' => $comment
         ], 201);
     }
 
-    public function addReplyComment(CommentRequest $request, $slug, $parent_id)
+    public function addReplyComment(CommentRequest $request, $slug, $commentId)
     {
         $post = Post::where('slug', $slug)->firstOrFail();
-        $parentComment = Comment::find($parent_id);
+        $mainComment = Comment::find($commentId);
     
         if (!$post) {
             return response()->json([
                 'message' => 'Post Not Found'
             ], 404);
         }
-  
-        if (!$parentComment || $parentComment->post_id != $post->id) {
+    
+        if (!$mainComment || $mainComment->post_id != $post->id) {
             return response()->json([
-                'message' => 'Invalid parent comment'
+                'message' => 'Invalid main comment'
             ], 400);
         }
     
-        $comment = $post->comments()->create([
+        $reply = $post->comments()->create([
             'content' => $request->content,
-            'parent_id' => $parent_id,
+            'parent_id' => $commentId,
             'user_id' => Auth::id(),
         ]);
     
         return response()->json([
             'message' => 'Reply comment successfully uploaded',
-            'comment' => $comment
+            'reply' => $reply
         ], 201);
     }
 
-    public function show($slug) {
-        $post = Post::where('slug', $slug)
+    public function showMainComment($slug)
+    {
+        $post = Post::where('slug', $slug)->firstOrFail();
+    
+        $mainComments = Comment::where('post_id', $post->id)
+            ->whereColumn('parent_id', 'id')
             ->with([
-                'comments.user', 
-                'comments.user.userProfile', 
-                'comments.replies'
+                'user', 
+                'user.userProfile', 
+                'replies.user', 
+                'replies.user.userProfile'
             ])
-            ->firstOrFail();
-
-        return response()->json($post);
+            ->get();
+    
+        return response()->json([
+            'post' => $post,
+            'mainComments' => $mainComments
+        ]);
     }
+    
+
+    public function showReplyComment($slug, $commentId) {
+    $post = Post::where('slug', $slug)->firstOrFail();
+    $mainComment = Comment::where('id', $commentId)
+        ->whereColumn('parent_id', 'id')
+        ->where('post_id', $post->id)
+        ->with([
+            'user.userProfile',
+            'replies.user', 
+            'replies.user.userProfile'
+        ])
+        ->first();
+
+    if (!$mainComment) {
+        return response()->json([
+            'message' => 'Invalid main comment'
+        ], 400);
+    }
+
+    return response()->json([
+        'mainComment' => $mainComment
+    ]);
+}
+
 }

@@ -48,8 +48,9 @@ Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
     Route::post('/member/image', [Member\AuthController::class, 'createUserImage']);
     Route::post('/post/report/{id}', [Post\ReportController::class, 'userReportPost']);
     Route::post('/post/comment/{slug}', [Post\CommentController::class, 'mainComment']);
-    Route::post('/post/comment/{slug}/{parent_id}', [Post\CommentController::class, 'addReplyComment']);
-    Route::get('/post/comment/{slug}', [Post\CommentController::class, 'show']);
+    Route::post('/post/comment/{slug}/{commentId}', [Post\CommentController::class, 'addReplyComment']);
+    Route::get('/post/comment/{slug}', [Post\CommentController::class, 'showMainComment']);
+    Route::get('/post/comment/{slug}/{commentId}', [Post\CommentController::class, 'showReplyComment']);
     Route::post('/edit/profileImage', [Member\AuthController::class, 'editUserImage']);
     Route::get('/post/bookmark', [Post\BookmarkController::class, 'show']);
     Route::post('/post/bookmark/{post}', [Post\BookmarkController::class, 'create']);

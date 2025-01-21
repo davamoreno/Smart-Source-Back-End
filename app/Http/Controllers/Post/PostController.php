@@ -7,16 +7,70 @@ use App\Models\File;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Report;
+use App\Models\Category;
+use App\Models\PaperType;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReportRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+
 class PostController extends Controller{    
+    
+    public function showPostByCategoryName($categoryName) {
+        $category = Category::where('name', $categoryName)->first();
+        
+        if (!$category) {
+            return response()->json(['message' => 'Category not found'], 404);
+        }
+
+        $posts = Post::with([
+            'user',
+            'likes' => function ($query) {
+                $query->where('user_id', auth('sanctum')->user()?->id);
+            },
+            'bookmarks' => function($query){
+                $query->where('user_id', auth('sanctum')->user()?->id);
+            }
+        ])->where('category_id', $category->id)->where('status', 'allow')->get();
+
+        $posts->transform(function ($post) {
+            $post->like = !$post->likes->isEmpty();
+            $post->bookmark = !$post->bookmarks->isEmpty();
+            return $post;
+        });
+    
+        return response()->json($posts);
+    }
+
+    public function showPostByPaperTypeName($paperTypeName) {
+        $paperType = PaperType::where('name', $paperTypeName)->first();
+        if (!$paperType) {
+            return response()->json(['message' => 'PaperType not found'], 404);
+        }
+
+        $posts = Post::with([
+            'user',
+            'likes' => function ($query) {
+                $query->where('user_id', auth('sanctum')->user()?->id);
+            },
+            'bookmarks' => function($query){
+                $query->where('user_id', auth('sanctum')->user()?->id);
+            }
+        ])->where('paper_type_id', $paperType->id)->get();
+
+        $posts->transform(function ($post) {
+            $post->like = !$post->likes->isEmpty();
+            $post->bookmark = !$post->bookmarks->isEmpty();
+            return $post;
+        });
+
+        return response()->json($posts);
+    }
 
     public function showUserPost(Request $request){
         $perPage = $request->input('per_page', 10);

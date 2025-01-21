@@ -86,3 +86,5 @@ Route::get('/get/faculties', [Post\Admin\FacultyController::class, 'index']);
 Route::get('/get/universities', [Post\Admin\UniversityController::class, 'index']);
 Route::get('/get/categories', [Post\CategoryController::class, 'index']);
 Route::get('/get/papertypes', [Post\PaperTypeController::class, 'getPaperTypes']);
+Route::get('/user/post/category/{categoryName}', [Post\PostController::class, 'showPostByCategoryName']);
+Route::get('/user/post/papertype/{paperTypeName}', [Post\PostController::class, 'showPostByPaperTypeName']);

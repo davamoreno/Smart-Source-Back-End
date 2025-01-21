@@ -53,6 +53,7 @@ Route::middleware(['auth:sanctum', 'role:member'])->group(function () {
     Route::get('/post/comment/{slug}/{commentId}', [Post\CommentController::class, 'showReplyComment']);
     Route::post('/edit/profileImage', [Member\AuthController::class, 'editUserImage']);
     Route::get('/post/bookmark', [Post\BookmarkController::class, 'show']);
+    Route::get('/post/history', [Post\HistoryController::class, 'show']);
     Route::post('/post/bookmark/{post}', [Post\BookmarkController::class, 'create']);
     Route::delete('/post/bookmark/{post}', [Post\BookmarkController::class, 'delete']);
     Route::post('/post/like/{slug}', [Post\LikeController::class, 'create']);

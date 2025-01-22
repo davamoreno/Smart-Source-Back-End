@@ -15,7 +15,7 @@ class CategoryController extends Controller
           $categories = Category::select('id', 'name')->get();  
         }
         else{
-            $categories = Category::paginate(5);
+            $categories = Category::paginate(10);
         }
         return response()->json($categories);
     }

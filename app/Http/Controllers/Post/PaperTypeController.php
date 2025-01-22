@@ -13,7 +13,7 @@ class PaperTypeController extends Controller
         if ($request->has('all') && $request->all === 'true') {
             $paperTypes = PaperType::select('id', 'name')->get();
         }else{
-            $paperTypes = PaperType::paginate(5);
+            $paperTypes = PaperType::paginate(10);
         }
         return response()->json($paperTypes);
     }

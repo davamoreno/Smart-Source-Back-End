@@ -40,7 +40,7 @@ Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->group(function ()
 });
 
 Route::get('/user/post/{slug}', [Post\PostController::class, 'getDetailPost']);
-Route::get('/post/report/{id}', [Post\ReportController::class, 'getReport']);
+Route::get('/post/report/{slug}', [Post\ReportController::class, 'getReport']);
 
 //Member Features
 Route::middleware(['auth:sanctum', 'role:member'])->group(function () {

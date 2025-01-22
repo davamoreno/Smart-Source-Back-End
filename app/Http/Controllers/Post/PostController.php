@@ -143,8 +143,8 @@ class PostController extends Controller{
     }
 
     public function showDenyPost(){
-        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy'])->latest();
-        $posts = $posts->where('status', 'deny')->paginate(10);
+        $posts = Post::with(['user', 'category', 'paperType', 'file', 'approvedBy']);
+        $posts = $posts->where('status', 'deny')->latest()->paginate(10);
         if (!$posts) {
             return response()->json(['message' => 'Post Not Found'], 404);
         }

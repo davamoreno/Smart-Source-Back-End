@@ -18,11 +18,9 @@ class ReportController extends Controller
         }
     }
 
-    public function getReport($id){
-        $post = Post::with('reports')->findOrFail($id);
-        return response()->json([
-            'post' => $post
-        ], 200);
+    public function getReport($slug){
+        $post = Post::with('reports', 'reports.user')->where('slug', $slug)->get();
+        return response()->json($post);
     }
 
     public function getAllReport(){

@@ -30,6 +30,8 @@ class PostController extends Controller{
 
         $posts = Post::with([
             'user',
+            'category',
+            'papertype',
             'likes' => function ($query) {
                 $query->where('user_id', auth('sanctum')->user()?->id);
             },
@@ -55,6 +57,8 @@ class PostController extends Controller{
 
         $posts = Post::with([
             'user',
+            'category',
+            'papertype',
             'likes' => function ($query) {
                 $query->where('user_id', auth('sanctum')->user()?->id);
             },

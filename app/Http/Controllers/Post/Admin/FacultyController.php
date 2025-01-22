@@ -14,9 +14,9 @@ class FacultyController extends Controller
     public function index(Request $request)
     {   
         if($request->has('all') && $request->all === 'true'){
-            $faculties = Faculty::select('id', 'name')->get();
+            $faculties = Faculty::with('university')->get();
         }else{
-            $faculties = Faculty::paginate(10);
+            $faculties = Faculty::with('university')->paginate(10);
         }
         return response()->json($faculties);
     }

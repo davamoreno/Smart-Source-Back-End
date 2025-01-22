@@ -76,8 +76,7 @@ class CommentController extends Controller
                 'user.userProfile', 
                 'replies.user', 
                 'replies.user.userProfile'
-            ])
-            ->get();
+            ])->orderBy('created_at', 'desc')->get();
     
         return response()->json([
             'post' => $post,
@@ -93,10 +92,12 @@ class CommentController extends Controller
         ->where('post_id', $post->id)
         ->with([
             'user.userProfile',
+            'replies' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            },
             'replies.user', 
             'replies.user.userProfile'
-        ])
-        ->first();
+        ])->first();
 
     if (!$mainComment) {
         return response()->json([

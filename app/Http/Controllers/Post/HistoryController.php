@@ -13,7 +13,16 @@ class HistoryController extends Controller
     public function show()
     {
         $user = auth()->user();
-        $history = $user->histories()->with('posts')->orderBy('seen_at', 'desc')->take(10)->get();
+        $history = $user->histories()->with([
+            'posts',
+            'posts.user',
+            'posts.papertype',
+            'posts.category',
+        ])
+        ->orderBy('seen_at', 'desc')
+        ->take(10)
+        ->get();
+
         return response()->json($history);
     }
 

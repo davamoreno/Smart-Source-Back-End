@@ -21,6 +21,11 @@ class AuthController extends Controller{
     
     public function getUserProfile(){
         $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+        
         $user->load(['userProfile', 'faculty.university']);
         return response()->json($user);
     }
@@ -65,7 +70,10 @@ class AuthController extends Controller{
         $user = $request->user();
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['message' => 'identifier Successfully', 'access_token' => $token, 'token_type' => 'Bearer'], 200);
+        return response()->json(['message' => 'identifier Successfully', 
+        'access_token' => $token, 
+        'token_type' => 'Bearer',
+        'user' => $user], 200);
     }
 
     public function logout(Request $request){

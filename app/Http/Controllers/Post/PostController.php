@@ -65,7 +65,7 @@ class PostController extends Controller{
             'bookmarks' => function($query){
                 $query->where('user_id', auth('sanctum')->user()?->id);
             }
-        ])->where('paper_type_id', $paperType->id)->get();
+        ])->where('paper_type_id', $paperType->id)->where('status', 'allow')->get();
 
         $posts->transform(function ($post) {
             $post->like = !$post->likes->isEmpty();
